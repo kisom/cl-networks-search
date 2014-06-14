@@ -9,7 +9,8 @@
   (:export :clean-path
            :bfs
            :dfs
-           :network-connected-p))
+           :network-connected-p
+           :local-gatekeeper-p))
 (in-package :networks-search)
 
 ;; "Lisp isn't a language, it's a building material. -Alan Kay"
@@ -134,3 +135,30 @@
            (node-connected-p net nd))
          net))
 
+(defmacro all (lst)
+  `(every #'identity ,lst))
+
+(defmacro none (lst)
+  `(not (some #'identity ,lst)))
+
+(defmacro any (lst)
+  `(some #'identity ,lst))
+
+(defun edges-into (net node)
+  (remove-if-not (lambda (o) (neighbour-p o node)) net))
+
+(defun local-gatekeeper-p (net node)
+  (let ((edges-in (edges-into net node))
+        (node-edges (mapcar (get-node-map net) (node-edges node))))
+    (any
+     (list
+      (remove-if (lambda (edge)
+                   (remove-if-not (lambda (o)
+                                    (neighbour-p edge o))
+                                  node-edges))
+                 edges-in)
+      (remove-if (lambda (edge)
+                   (remove-if-not (lambda (o)
+                                    (neighbour-p edge o))
+                                  edges-in))
+                 node-edges)))))

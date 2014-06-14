@@ -55,4 +55,10 @@
   (unless (network-connected-p ARPA-NET)
     (error "ARPA-NET is connected, but NETWORK-CONNECTED-P disagrees.")))
 
+(when (local-gatekeeper-p ARPA-NET (networks-graph:get-node ARPA-NET 'ucsb))
+  (error "UCSB is not a local gatekeeper."))
+(unless (local-gatekeeper-p ARPA-NET (networks-graph:get-node ARPA-NET 'sdc))
+  (error "SDC is a local gatekeeper."))
+
 (format t "~%~%NETWORKS-SEARCH-TEST ok.~%")
+
